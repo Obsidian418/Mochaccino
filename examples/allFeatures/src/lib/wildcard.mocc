@@ -1,0 +1,5 @@
+package wildcard;
+
+module WildcardModule {
+    func print(value<str>)<void> { Console.log(value); }
+}

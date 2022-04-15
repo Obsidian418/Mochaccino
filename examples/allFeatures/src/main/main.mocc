@@ -1,0 +1,98 @@
+package main;
+
+include math;
+include debugging.Inspector;
+dock {
+    'lib/types.mocc' as Types,
+    foo from "github.com/..." as gitfoo,
+    * from "lib/wildcard.mocc",
+}
+
+struct JSON {
+    @elementary
+    constructor(value<map>)<map<str, dyn>> {
+        return value.map((dyn key) { return key.toString(); }, (dyn value) { return value; });
+    }
+
+    func hasKey(key<str>)<bool> { return this.keys.contains(key); }
+
+    prop id<str> {
+        get { return this['id']; }
+        set { this['id'] = id; }
+    }
+
+    static func stringify(value<JSON>)<str> { return value.toString(); }
+}
+
+struct JSONv2 extends JSON {
+    @elementary
+
+    prop version<num> {
+        get { return 2; }
+    }
+}
+
+struct APIService {
+    @protocol
+
+    func get(request<Types.request>)<Types.response>;
+
+    @optional
+    func post(request<Types.request>)<Types.response>;
+}
+
+module CoffeeMachine implements APIService {
+    func get(request<Types.request>)<JSON> {
+        var returnable<JSON>;
+        if (request.JSONversion == 2) {
+            guarded {
+                returnable = {}::JSONv2;
+            }
+            except {
+                returnable = {};
+            }
+        } else {
+            returnable = {};
+        }
+        return returnable;
+    }
+
+    func get(request<Types.request>)<Types.response> {
+        return 1::Types.response;
+    }
+}
+
+module RandomFuncs {
+    func paramaterExamples(
+        requiredPositional<num>,
+        optionalPositional<bool> = true,
+        named requiredNamed<str>,
+        named optionalNamed<bool> = false,
+    )<void> {}
+
+    func asyncExample(customString<str>)<promise<num>> async {
+        /// returns the length of the given string after an asynchronous delay
+        if (customString.startsWith('h')) {
+            ok;
+        } else {
+            #label: $customString does not start with 'h'
+            notok;
+        }
+        return customString.length;
+    }
+}
+
+module Main implements EntryPoint {
+    func main(args<arr<str>>)<void> {
+        RandomFuncs.paramaterExamples(
+            1,
+            optionalPositional = false,
+            requiredNamed: 'hello',
+            optionalNamed: true,
+        );
+
+        var res<num> = await RandomFuncs.asyncExample('hello');
+        Console.log(res);
+        res.onChange((newValue<num>) { if (num<0) { pause; } });
+    }
+}

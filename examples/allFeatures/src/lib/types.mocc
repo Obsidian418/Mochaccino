@@ -1,0 +1,9 @@
+package types;
+
+struct request {
+    @elementary
+}
+
+struct response {
+    @elementary
+}
