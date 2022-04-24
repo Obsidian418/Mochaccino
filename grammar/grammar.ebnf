@@ -1,0 +1,184 @@
+################################
+# LITERALS #####################
+################################
+literal = NUMBER
+        | STRING
+        | "true"
+        | "false"
+        | "null"
+        | array_literal
+        | map_literal
+        | func_decl
+;
+value = literal | identifier;
+array_literal = "[" 
+                    (value)
+                    (
+                      "," (value)
+                    )*
+                "]"
+;
+map_literal = "{" 
+                  (value ":" value)
+                  (
+                    "," (value ":" value)
+                  )*
+              "}"
+;
+kw_ok = "ok";
+kw_notok = "notok";
+kw_named = "named";
+kw_package = "package";
+kw_include = "include";
+kw_from = "from";
+kw_as = "as";
+kw_guarded = "guarded";
+kw_except = "except";
+kw_var = "var";
+kw_return = "return";
+kw_async = "async";
+kw_static = "static";
+kw_module = "module":
+kw_struct = "struct";
+kw_func = "func";
+kw_dock = "dock";
+kw_extends = "extends";
+kw_implements = "implements";
+kw_if = "if";
+kw_elif = "elif";
+kw_else = "else";
+kw_for = "for";
+kw_while = "while";
+kw_prop = "prop";
+kw_get = "get";
+kw_set = "set";
+
+
+###################
+# GENERIC
+###################
+program = (statement | block)*;
+statement = package_decl
+          | include_decl
+          | import_decl
+          | assignment
+          | debug_flag
+          | struct_annotation
+          | kw_ok
+          | kw_notok
+          | expression
+          | prop_const
+;
+block = dock_block
+      | module_block
+      | struct_block
+      | func_decl
+      | if_block
+      | for_loop
+      | while_loop
+      | prop_block
+;
+expression = binary_exp
+           | unary_exp
+           | comparative_exp
+           | property_access
+           | item_access
+;
+type_annotation = "<"
+                    TYPE 
+                    ["," type_annotation] 
+                  ">"
+;
+arithmetic_op = "+" | "-" | "*" | "/" | "%";
+logical_op = "||" | "&&" | "<=" | ">=";
+comparative_op = "==" | "!=";
+unary_op = "!" | "++" | "--" | "-" | "+";
+params = (
+            ([kw_named] identifier [type_annotation])
+            ("," [kw_named] identifier [type_annotation])*
+         )*
+;
+
+###################
+# STATEMENTS
+###################
+package_decl = kw_package identifier ";";
+include_decl = kw_include identifier ";";
+import_decl = " "*
+            (| STRING
+            | identifier kw_from STRING
+            | identifier kw_from STRING kw_as identifier
+            )  ";"
+;
+assignment = (initialiser | reassignment) ";";
+reassignment = identifier "=" expression  ";";
+initialiser = kw_var identifier [type_annotation] "=" expression  ";";
+prop_const = kw_prop identifier ";";
+debug_flag = "#" identifier [":" TEXT] "\n";
+struct_annotation = "@elementary"
+                  | "@protocol"
+                  | "@enum"
+                  | "@abstract"
+;
+
+###################
+# BLOCKS
+###################
+dock_block = kw_dock "{"
+                (import_decl)*
+             "}"
+;
+module_block = kw_module TYPE [kw_implements TYPE] "{"
+                (statement)*
+               "}"
+;
+struct_block = kw_struct TYPE [(kw_extends|kw_implements) TYPE] "{"
+                (struct_annotation)+
+                (statement)*
+               "}"
+;
+func_decl = kw_func " " identifier "(" params ")" type_annotation [kw_async] "{"
+            (statement)*
+            "}"
+;
+if_block = (
+              kw_if "(" comparative_exp ")" "{" (statement)* "}"
+              [(kw_elif "(" comparative_exp ")" "{" (statement)* "}")*]
+              [kw_else "{" (statement)* "}"]
+           )
+;
+for_loop = (
+              kw_for "(" [initialiser] ";" [comparative_exp] ";" [expression] ";" ")"
+              "{"
+                  (statement)*
+              "}"
+           )
+;
+while_loop = (
+              kw_while "(" (binary_exp | comparative_exp) ")"
+              "{"
+                  (statement)*
+              "}"
+             )
+;
+prop_block = kw_prop identifier type_annotation
+            "{"
+                [
+                  kw_get "{"
+                    (statement)*
+                  "}"
+                ]
+                [
+                  kw_set "{"
+                    (statement)*
+                  "}"
+                ]
+            "}"
+;
+
+###################
+# EXPRESSIONS
+###################
+binary_exp = expression arithmetic_op expression;
+unary_exp = unary_op expression | expression unary_op;
+comparative_exp = expression comparative_op expression;
