@@ -8,7 +8,6 @@ literal = NUMBER
         | "null"
         | array_literal
         | map_literal
-        | func_decl
 ;
 value = literal | identifier;
 array_literal = "[" 
@@ -78,21 +77,11 @@ block = dock_block
       | while_loop
       | prop_block
 ;
-expression = binary_exp
-           | unary_exp
-           | comparative_exp
-           | property_access
-           | item_access
-;
 type_annotation = "<"
                     TYPE 
                     ["," type_annotation] 
                   ">"
 ;
-arithmetic_op = "+" | "-" | "*" | "/" | "%";
-logical_op = "||" | "&&" | "<=" | ">=";
-comparative_op = "==" | "!=";
-unary_op = "!" | "++" | "--" | "-" | "+";
 params = (
             ([kw_named] identifier [type_annotation])
             ("," [kw_named] identifier [type_annotation])*
@@ -179,6 +168,14 @@ prop_block = kw_prop identifier type_annotation
 ###################
 # EXPRESSIONS
 ###################
+expression = binary_exp | unary_exp | comparative_exp | logical_exp | group | value;
+group = "(" expression ")";
+logical_exp = expression logical_op expression;
 binary_exp = expression arithmetic_op expression;
-unary_exp = unary_op expression | expression unary_op;
+unary_exp = (unary_prefix (unary_exp | value)) | ((unary_exp | value) unary_postfix);
 comparative_exp = expression comparative_op expression;
+arithmetic_op = "+" | "-" | "*" | "/" | "%";
+logical_op = "||" | "&&";
+comparative_op = "==" | "!=" | "<" | ">" | "<=" | ">=";
+unary_prefix = "!" | "-";
+unary_postfix = "++" | "--";
