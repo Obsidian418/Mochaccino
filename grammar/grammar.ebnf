@@ -10,16 +10,16 @@ literal = NUMBER
         | map_literal
 ;
 array_literal = "[" 
-                    (term)
+                    (value)
                     (
-                      "," (term)
+                      "," (value)
                     )*
                 "]"
 ;
 map_literal = "{" 
-                  (term ":" term)
+                  (value ":" value)
                   (
-                    "," (term ":" term)
+                    "," (value ":" value)
                   )*
               "}"
 ;
@@ -168,32 +168,20 @@ prop_block = kw_prop identifier type_annotation
 ###################
 # EXPRESSIONS
 ###################
-expression = binary_exp | unary_exp | comparative_exp | logical_exp | group | term;
-group = "(" expression ")";
-logical_exp = expression logical_op expression;
-binary_exp = expression arithmetic_op expression;
-unary_exp = (unary_prefix (unary_exp | term)) | ((unary_exp | term) unary_postfix);
-comparative_exp = expression comparative_op expression;
-arithmetic_op = "+" | "-" | "*" | "/" | "%";
-logical_op = "||" | "&&";
-comparative_op = "==" | "!=" | "<" | ">" | "<=" | ">=";
-unary_prefix = "!" | "-";
-unary_postfix = "++" | "--";
 
-
-###################
-# EXPRESSIONS 2.1
-###################
-# TEST: 1 + 2 / 3 < 4 == 5 * (1+2) > -10
-# EXPECTED: true
-expression = binary_exp | group | term;
-term = literal | identifier | func_call;
-group = "(" expression ")";
-binary_exp = unary_exp binary_op binary_exp | unary_exp;
+expression = equality_exp;
+equality_exp = logical_exp (equality_op logical_exp)*;
+logical_exp = comparative_exp (logical_op comparative_exp)*;
+comparative_exp = binary_exp (comparative_op binary_exp)*;
+binary_exp = unary_exp (arithmetic_op unary_exp);
+term = factor (("+" | "-") factor)*;
+factor = unary_exp (("/" | "*") unary_exp)*;
 unary_exp = unary_prefix | unary_postfix;
-unary_prefix = ["-" | "!"] term;
-unary_postfix = term ["++" | "--"];
-binary_op = arithmetic_op | comparative_op | logical_op;
+unary_prefix = ["-" | "!"] value;
+unary_postfix = value ["++" | "--"];
 arithmetic_op = "/" | "*" | "+" | "-";
-comparative_op = "==" | "!=" | ">" | ">=" | "<" | "<=";
+equality_op = "==" | "!=";
+comparative_op = ">" | ">=" | "<" | "<=";
 logical_op = "||" | "&&";
+value = literal | identifier | group;
+group = "(" expression ")";
