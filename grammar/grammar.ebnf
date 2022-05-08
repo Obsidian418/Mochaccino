@@ -9,21 +9,21 @@ literal = NUMBER
         | array_literal
         | map_literal
 ;
-value = literal | identifier;
 array_literal = "[" 
-                    (value)
+                    (term)
                     (
-                      "," (value)
+                      "," (term)
                     )*
                 "]"
 ;
 map_literal = "{" 
-                  (value ":" value)
+                  (term ":" term)
                   (
-                    "," (value ":" value)
+                    "," (term ":" term)
                   )*
               "}"
 ;
+func_call = identifier ("." identifier)* "(" params ")";
 kw_ok = "ok";
 kw_notok = "notok";
 kw_named = "named";
@@ -83,8 +83,8 @@ type_annotation = "<"
                   ">"
 ;
 params = (
-            ([kw_named] identifier [type_annotation])
-            ("," [kw_named] identifier [type_annotation])*
+            ([kw_named] (identifier | expression) [type_annotation])
+            ("," [kw_named] (identifier | expression) [type_annotation])*
          )*
 ;
 
@@ -168,14 +168,32 @@ prop_block = kw_prop identifier type_annotation
 ###################
 # EXPRESSIONS
 ###################
-expression = binary_exp | unary_exp | comparative_exp | logical_exp | group | value;
+expression = binary_exp | unary_exp | comparative_exp | logical_exp | group | term;
 group = "(" expression ")";
 logical_exp = expression logical_op expression;
 binary_exp = expression arithmetic_op expression;
-unary_exp = (unary_prefix (unary_exp | value)) | ((unary_exp | value) unary_postfix);
+unary_exp = (unary_prefix (unary_exp | term)) | ((unary_exp | term) unary_postfix);
 comparative_exp = expression comparative_op expression;
 arithmetic_op = "+" | "-" | "*" | "/" | "%";
 logical_op = "||" | "&&";
 comparative_op = "==" | "!=" | "<" | ">" | "<=" | ">=";
 unary_prefix = "!" | "-";
 unary_postfix = "++" | "--";
+
+
+###################
+# EXPRESSIONS 2.0
+###################
+# TEST: 1 + 2 / 3 < 4 == 5 * (1+2) > -10
+# EXPECTED: true
+expression = binary_exp | group | term;
+term = literal | identifier | func_call;
+group = "(" expression ")";
+binary_exp = unary_exp binary_op binary_exp | unary_exp;
+unary_exp = unary_prefix | unary_postfix;
+unary_prefix = ["-" | "!"] term;
+unary_postfix = term ["++" | "--"];
+binary_op = arithmetic_op | comparative_op | logical_op;
+arithmetic_op = "/" | "*" | "+" | "-";
+comparative_op = "==" | "!=" | ">" | ">=" | "<" | "<=";
+logical_op = "||" | "&&";
