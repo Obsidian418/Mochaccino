@@ -56,17 +56,22 @@ kw_set = "set";
 ###################
 # GENERIC
 ###################
-program = (statement | block)*;
-statement = package_decl
-          | include_decl
-          | import_decl
-          | assignment
-          | debug_flag
+program = (declaration | block)*;
+declaration = ( package_decl
+            | include_decl
+            | import_decl
+            | initialiser
+            | statement
+            )
+;
+
+statement = ( debug_flag
           | struct_annotation
           | kw_ok
           | kw_notok
           | expression
           | prop_const
+          )
 ;
 block = dock_block
       | module_block
@@ -91,18 +96,16 @@ params = (
 ###################
 # STATEMENTS
 ###################
-package_decl = kw_package identifier ";";
-include_decl = kw_include identifier ";";
+package_decl = kw_package identifier;
+include_decl = kw_include identifier;
 import_decl = " "*
             (| STRING
             | identifier kw_from STRING
             | identifier kw_from STRING kw_as identifier
-            )  ";"
+            )
 ;
-assignment = (initialiser | reassignment) ";";
-reassignment = identifier "=" expression  ";";
-initialiser = kw_var identifier [type_annotation] "=" expression  ";";
-prop_const = kw_prop identifier ";";
+initialiser = kw_var identifier [type_annotation] ["=" expression] ";";
+prop_const = kw_prop identifier;
 debug_flag = "#" identifier [":" TEXT] "\n";
 struct_annotation = "@elementary"
                   | "@protocol"
@@ -169,19 +172,16 @@ prop_block = kw_prop identifier type_annotation
 # EXPRESSIONS
 ###################
 
-expression = equality_exp;
-equality_exp = logical_exp (equality_op logical_exp)*;
+expression = assignment;
+assignment = (identifier "=" assignment) | expression;
+equality_exp = logical_exp (equ ality_op logical_exp)*;
 logical_exp = comparative_exp (logical_op comparative_exp)*;
 comparative_exp = binary_exp (comparative_op binary_exp)*;
-binary_exp = term (arithmetic_op term);
-term = factor (("+" | "-") factor)*;
+binary_exp = factor (("+" | "-") factor)*;
 factor = unary_exp (("/" | "*") unary_exp)*;
-unary_exp = unary_prefix | unary_postfix;
-unary_prefix = ["-" | "!"] value;
-unary_postfix = value ["++" | "--"];
+unary_exp = ["-" | "!"] value;
 arithmetic_op = "/" | "*" | "+" | "-";
 equality_op = "==" | "!=";
 comparative_op = ">" | ">=" | "<" | "<=";
 logical_op = "||" | "&&";
-value = literal | identifier | group;
-group = "(" expression ")";
+value = literal | identifier | "(" expression ")";
