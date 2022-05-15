@@ -56,7 +56,7 @@ kw_set = "set";
 ###################
 # GENERIC
 ###################
-program = (declaration | block)*;
+program = declaration*;
 declaration = ( package_decl
             | include_decl
             | import_decl
@@ -71,9 +71,12 @@ statement = ( debug_flag
           | kw_notok
           | expression
           | prop_const
+          | block
+          | if_block
           )
 ;
-block = dock_block
+block = "{" declaration* "}";
+(* block = dock_block
       | module_block
       | struct_block
       | func_decl
@@ -81,7 +84,7 @@ block = dock_block
       | for_loop
       | while_loop
       | prop_block
-;
+; *)
 type_annotation = "<"
                     TYPE 
                     ["," type_annotation] 
@@ -134,9 +137,9 @@ func_decl = kw_func " " identifier "(" params ")" type_annotation [kw_async] "{"
             "}"
 ;
 if_block = (
-              kw_if "(" comparative_exp ")" "{" (statement)* "}"
-              [(kw_elif "(" comparative_exp ")" "{" (statement)* "}")*]
-              [kw_else "{" (statement)* "}"]
+              kw_if "(" expression ")" statement
+              [(kw_elif "(" expression ")" statement)*]
+              [kw_else statement]
            )
 ;
 for_loop = (
@@ -146,13 +149,7 @@ for_loop = (
               "}"
            )
 ;
-while_loop = (
-              kw_while "(" (binary_exp | comparative_exp) ")"
-              "{"
-                  (statement)*
-              "}"
-             )
-;
+while_loop = kw_while "(" (expression) ")" statement;
 prop_block = kw_prop identifier type_annotation
             "{"
                 [
