@@ -1,0 +1,17 @@
+package function;
+
+struct fn {
+    @elementary
+    @abstract
+
+    var returnType<type>;
+    var args<map<str, arr>> = {};
+
+    func call()<returnType> {
+        return ...; 
+    }
+
+    prop signature<str> {
+        get { return args.toString(); }
+    }
+}

@@ -1,0 +1,61 @@
+package string;
+
+struct str {
+    constructor()<str> {
+
+    }
+}
+
+module String {
+    func toString(obj<dyn>)<str> {
+
+    }
+
+    func contains(obj<str> other<str>)<bool> {
+
+    }
+
+    func startsWith(obj<str>, other<str>)<bool> {
+
+    }
+
+    func endsWith(obj<str>, other<str>)<bool> {
+
+    }
+
+    func indexOf(obj<str>, substring<str>)<num> {
+
+    }
+
+    func pad(
+        obj<str>,
+        padItem<str> = ' ',
+        named left<num> = 0,
+        named right<num> = 0
+    )<str> {
+        return (padItem*left + obj + padItem*right);
+    }
+
+    func replace(
+        obj<str>,
+        substring<str>,
+        replaceItem<str>,
+        named mapped = {},
+    )<str> {
+        if (mapped!={}) {
+
+        } else {
+
+        }
+    }
+
+    func split(obj<str>)<arr<str>> {
+        var returnable<arr<str>> = [];
+        for (i<num> = 0; i<obj.length; i++) {
+            returnable.add(obj[i]);
+        }
+        return returnable;
+    }
+
+    lower, upper, trim
+}

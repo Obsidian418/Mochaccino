@@ -1,0 +1,8 @@
+/**
+Use:
+    Array.item(1)
+    Map.item('key')
+Instead of:
+    Array[0]
+    Map['key']
+**/

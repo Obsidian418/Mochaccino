@@ -1,0 +1,30 @@
+package type;
+
+struct type {
+    @elementary
+    @abstract
+
+    var objId<str>;
+    var changeCallback<fn<void>> = (newValue<this>) {};
+    constructor(obj<dyn>)<type> {
+        objId = "someId";
+    }
+
+    prop runtimeType<type> {
+        get { return this; }
+    }
+
+    prop objectId<str> {
+        get { return objId; }
+    }
+
+    func toString()<str> {
+        // implementation of toString for default types, and for user-defined types
+    }
+
+    func onChange(callback<fn<void>>)<void> {
+        if (callback.signature == changeCallback.signature) {
+            
+        }
+    }
+}

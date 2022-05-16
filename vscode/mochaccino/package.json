@@ -1,0 +1,24 @@
+{
+    "name": "mochaccino",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": ">=0.9.0-pre.1"
+    },
+    "publisher": "Infinitum Labs Inc",
+    "contributes": {
+        "languages": [
+            {
+                "id": "mochaccino",
+                "aliases": ["Mochaccino", "mocc", "Mocc"],
+                "extensions": [".mocc",".mochaccino"]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "mochaccino",
+                "scopeName": "source.mochaccino",
+                "path": "./syntaxes/mochaccino.tmGrammar.json"
+            }
+          ]
+    }
+}

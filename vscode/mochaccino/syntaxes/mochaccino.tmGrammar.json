@@ -1,0 +1,41 @@
+{
+    "scopeName": "source.mochaccino",
+    "patterns": [{ "include": "#statement" }, { "include": "#block" }],
+    "repository": {
+      "statement": {
+        "patterns": [
+          { "include": "#package_decl"},
+          { "include": "#include_decl"},
+          { "include": "#import_decl"},
+          { "include": "#assignment"},
+          { "include": "#debug_flag"},
+          { "include": "#struct_annotation"},
+          { "include": "#kw_ok"},
+          { "include": "#kw_notok"},
+          { "include": "#expression"},
+          { "include": "#prop_const"}
+        ]
+      },
+
+      "block": {
+        "patterns": [
+          { "include": "#dock_block"},
+          { "include": "#module_block"},
+          { "include": "#struct_block"},
+          { "include": "#func_decl"},
+          { "include": "#if_block"},
+          { "include": "#for_loop"},
+          { "include": "#while_loop"},
+          { "include": "#prop_block"}
+        ]
+      },
+
+      "type_annotation": {
+        "begin": "<(.*)>",
+        "end": "",
+        "patterns": [
+          { "include": "#dock_block"}
+        ]
+      }
+    }
+}
